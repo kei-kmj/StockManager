@@ -12,9 +12,9 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-
+# @appはFastAPIのインスタンス
 @app.get("/")
-async def root():
+async def root() :
     return {"message": "Hello World"}
 
 
