@@ -1,9 +1,12 @@
 from datetime import datetime, timezone
 from typing import List, Optional
 from sqlalchemy import String, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.db.database import Base
+from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
 
+
+# モデルのベースクラス
+class Base(DeclarativeBase):
+    pass
 
 # https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-mapped-column-nullability
 # 型アノテーション (Mapped[T])でデータ型とnullabilityを自動推論する

@@ -1,5 +1,7 @@
+import asyncio
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from app.db.models import Base
 
 
 DATABASE_URL = "sqlite+aiosqlite:///./app/db/stockmanager.db"
@@ -10,13 +12,19 @@ DATABASE_URL = "sqlite+aiosqlite:///./app/db/stockmanager.db"
 # この Engine を通じて、SQLAlchemy はデータベースとの通信を行う。
 # create_engine() は 遅延接続 (lazy initialization) を採用し、
 # create_engine() を実行した時点では、実際にはデータベースに接続せず、最初の DB アクセス時に接続を確立する
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": False}, echo=True)
 
 # セッションの作成
 # 同期・非同期を混在させる場合はsessionmaker(engine, class_=AsyncSession)にすると汎用的
-async_session = async_sessionmaker(engine)
+async_session = async_sessionmaker(engine, expire_on_commit=False)
 
-# モデルのベースクラス
-class Base(DeclarativeBase):
-    pass
+
+async def init_db():
+    async with engine.connect() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        print("既存のテーブルを削除しました")
+
+        await conn.run_sync(Base.metadata.create_all)
+        print("新しいテーブルを作成しました")
+
 

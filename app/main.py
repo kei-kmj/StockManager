@@ -1,7 +1,17 @@
+import asyncio
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+from app.db.database import init_db
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+app = FastAPI(lifespan=lifespan)
 
 # CORSの設定
 app.add_middleware(
@@ -11,6 +21,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+
+
 
 # @appはFastAPIのインスタンス
 @app.get("/")
