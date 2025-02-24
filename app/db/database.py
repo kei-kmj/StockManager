@@ -1,8 +1,8 @@
 import asyncio
 
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from app.db.models import Base
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+from app.db.models import Base
 
 DATABASE_URL = "sqlite+aiosqlite:///./app/db/stockmanager.db"
 
@@ -19,7 +19,7 @@ engine = create_async_engine(DATABASE_URL, connect_args={"check_same_thread": Fa
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def init_db():
+async def init_db() -> None :
     async with engine.connect() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         print("既存のテーブルを削除しました")

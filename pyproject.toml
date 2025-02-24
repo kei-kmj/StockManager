@@ -1,0 +1,26 @@
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 120
+select = [
+    "E", "F", "I",  # 基本的なエラーとフォーマット
+    "W", "N", "B",  # 警告、命名規則、バグ回避
+    "C", "SIM", "ARG",  # コードの単純化、引数チェック
+]
+ignore = [
+    "E203",  # `:` の前後のスペース（Blackと競合）
+    "E501",  # 行の長さ（Blackが整形）
+]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+files = ["app"]

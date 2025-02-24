@@ -1,15 +1,18 @@
 from datetime import datetime, timezone
 from typing import List, Optional
-from sqlalchemy import String, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
+
+from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 # モデルのベースクラス
 class Base(DeclarativeBase):
     pass
 
+
 # https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-mapped-column-nullability
 # 型アノテーション (Mapped[T])でデータ型とnullabilityを自動推論する
+
 
 class User(Base):
     __tablename__ = "users"
@@ -17,7 +20,9 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now(timezone.utc)
+    )
 
     # https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#one-to-many
     # relationship() は Mapped アノテーションから対象クラス（関連先）とコレクションの型を推論する
@@ -43,7 +48,9 @@ class Maker(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now(timezone.utc)
+    )
 
     items: Mapped[List["Item"]] = relationship(back_populates="maker")
 
@@ -54,7 +61,9 @@ class Item(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
     maker_id: Mapped[int] = mapped_column(ForeignKey("makers.id"))
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now(timezone.utc)
+    )
 
     maker: Mapped["Maker"] = relationship(back_populates="items")
     stock_events: Mapped[List["StockEvent"]] = relationship(back_populates="item")
@@ -68,7 +77,9 @@ class StockEvent(Base):
     item_id: Mapped[int] = mapped_column(ForeignKey("items.id"))
     event_type: Mapped[str] = mapped_column(String)
     quantity: Mapped[int] = mapped_column(Integer)
-    event_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    event_date: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.now(timezone.utc)
+    )
     note: Mapped[Optional[str]] = mapped_column(String)
 
     user: Mapped["User"] = relationship(back_populates="stock_events")
