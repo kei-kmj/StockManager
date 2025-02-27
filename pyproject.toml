@@ -7,12 +7,12 @@ profile = "black"
 
 [tool.ruff]
 line-length = 120
-select = [
+lint.select = [
     "E", "F", "I",  # 基本的なエラーとフォーマット
     "W", "N", "B",  # 警告、命名規則、バグ回避
     "C", "SIM", "ARG",  # コードの単純化、引数チェック
 ]
-ignore = [
+lint.ignore = [
     "E203",  # `:` の前後のスペース（Blackと競合）
     "E501",  # 行の長さ（Blackが整形）
 ]

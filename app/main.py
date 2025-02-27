@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from app.db.database import init_db
+from app.router.users import router as user_router
 
 
 @asynccontextmanager
@@ -26,11 +27,4 @@ app.add_middleware(
 
 
 # @appはFastAPIのインスタンス
-@app.get("/")
-async def root() -> dict[str, str]:
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str) -> dict[str, str]:
-    return {"message": f"Hello {name}"}
+app.include_router(user_router, tags=["Users"])

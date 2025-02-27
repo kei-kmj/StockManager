@@ -1,4 +1,5 @@
 import asyncio
+from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
@@ -27,4 +28,8 @@ async def init_db() -> None :
         await conn.run_sync(Base.metadata.create_all)
         print("新しいテーブルを作成しました")
 
+
+async def get_db() -> AsyncGenerator:
+    async with async_session() as session:
+        yield session
 
