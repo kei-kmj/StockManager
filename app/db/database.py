@@ -23,6 +23,9 @@ async_session = async_sessionmaker(engine, expire_on_commit=False)
 async def init_db() -> None :
     async with engine.connect() as conn:
 
+        # await conn.run_sync(Base.metadata.drop_all)
+        # print("削除")
+
         await conn.run_sync(Base.metadata.create_all)
         print("新しいテーブルを作成しました")
 

@@ -4,7 +4,20 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
-from app.schemas.users import UserCommon, UserCreate
+from app.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.schemas.users import UserCreate, UserUpdate
+
+
+async def is_duplicate_email(email: str, db: AsyncSession) -> bool:
+    """emailが一致するかチェック"""
+    query = await db.execute(select(User).where(User.email == email))
+    return query.scalars().first() is not None
+
+
+async def is_duplicate_nickname(nickname: str, db: AsyncSession) -> bool:
+    """`nickname` が既に存在するかチェック"""
+    query = await db.execute(select(User).where(User.nickname == nickname))
+    return query.scalars().first() is not None
 
 
 async def get_users(db: AsyncSession) -> Sequence[User]:
@@ -12,44 +25,57 @@ async def get_users(db: AsyncSession) -> Sequence[User]:
     return result.scalars().all()
 
 
-async def get_user(user_id: int, db: AsyncSession) -> User | None:
-    result = await db.execute(select(User).filter(User.id == user_id))
+async def get_user(user_id: int, db: AsyncSession) -> User:
+    query = await db.execute(select(User).filter(User.id == user_id))
+    found_user = query.scalars().first()
 
-    return result.scalars().first()
+    if not found_user:
+        raise NotFoundError(f"Maker ID {user_id} not found")
+
+    return found_user
 
 
 async def create_user(user: UserCreate, db: AsyncSession) -> User:
-    db_user = User(**user.model_dump())
 
-    db.add(db_user)
+    if await is_duplicate_email(user.email, db):
+        raise AlreadyExistsError(f"User this email {user.email} already exists")
+
+    if await is_duplicate_nickname(user.nickname, db):
+        raise AlreadyExistsError(
+            f"User with this nickname {user.nickname} already exists"
+        )
+
+    new_user = User(**user.model_dump())
+
+    db.add(new_user)
     await db.commit()
-    await db.refresh(db_user)
+    await db.refresh(new_user)
 
-    return db_user
+    return new_user
 
 
-async def update_user(user_id: int, user: UserCommon, db: AsyncSession) -> User | None:
-    result = await db.execute(select(User).filter(User.id == user_id))
-    db_user = result.scalars().first()
+async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> User:
+    query = await db.execute(select(User).filter(User.id == user_id))
+    found_user = query.scalars().first()
 
-    if not db_user:
-        return None
+    if not found_user:
+        raise NotFoundError(f"User ID {user_id} not found")
 
-    db_user.name = user.name
-    db_user.email = user.email
+    found_user.name = user.name
+    found_user.email = user.email
 
     await db.commit()
-    await db.refresh(db_user)
+    await db.refresh(found_user)
 
-    return db_user
+    return found_user
 
 
 async def delete_user(user_id: int, db: AsyncSession) -> None:
-    result = await db.execute(select(User).filter(User.id == user_id))
-    db_user = result.scalars().first()
+    query = await db.execute(select(User).filter(User.id == user_id))
+    found_user = query.scalars().first()
 
-    if not db_user:
-        return None
+    if not found_user:
+        raise NotFoundError(f"User ID {user_id} not found")
 
-    await db.delete(db_user)
+    await db.delete(found_user)
     await db.commit()
