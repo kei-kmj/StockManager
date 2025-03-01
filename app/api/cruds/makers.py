@@ -5,9 +5,9 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Maker
 from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
 from app.api.schemas.makers import MakerCreate, MakerUpdate
+from app.db.models import Maker
 
 
 def normalize_company_name(name: str) -> str:

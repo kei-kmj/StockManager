@@ -69,7 +69,9 @@ class Item(Base):
     maker: Mapped["Maker"] = relationship(back_populates="items")
     stock_events: Mapped[List["StockEvent"]] = relationship(back_populates="item")
 
-    __table_args__ = (UniqueConstraint("name", "maker_id", name="uq_items_name_maker_id"),)
+    __table_args__ = (
+        UniqueConstraint("name", "maker_id", name="uq_items_name_maker_id"),
+    )
 
 
 class StockEvent(Base):

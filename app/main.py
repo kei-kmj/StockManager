@@ -4,10 +4,10 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from app.db.database import init_db
 from app.api.router.items import router as item_router
 from app.api.router.makers import router as maker_router
 from app.api.router.users import router as user_router
+from app.db.database import init_db
 
 
 @asynccontextmanager

@@ -1,16 +1,18 @@
 from typing import Sequence
 
-from sqlalchemy import select, Select
+from sqlalchemy import ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.db.models import Item, Maker
-from app.api.entity.exceptions import NotFoundError, AlreadyExistsError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
 from app.api.schemas.items import ItemCreate, ItemUpdate
+from app.db.models import Item
 
 
-async def is_duplicate_item(name: str, maker_id: int, db:AsyncSession) -> bool:
-    query = await db.execute(select(Item).filter(Item.name == name, Item.maker_id == maker_id))
+async def is_duplicate_item(name: str, maker_id: int, db: AsyncSession) -> bool:
+    query = await db.execute(
+        select(Item).filter(Item.name == name, Item.maker_id == maker_id)
+    )
 
     return query.scalars().first() is not None
 
@@ -20,7 +22,7 @@ async def get_items(db: AsyncSession) -> Sequence[Item]:
     return result.scalars().all()
 
 
-async def get_item(item_id: int, db: AsyncSession) -> Item | None:
+async def get_item(item_id: int, db: AsyncSession) -> Item:
     query = await db.execute(
         select(Item).options(joinedload(Item.maker)).filter(Item.id == item_id)
     )
@@ -35,7 +37,7 @@ async def get_item(item_id: int, db: AsyncSession) -> Item | None:
 async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
 
     if await is_duplicate_item(item.name, item.maker_id, db):
-        raise AlreadyExistsError( "item name already exists" )
+        raise AlreadyExistsError("item name already exists")
 
     new_item = Item(**item.model_dump())
 
@@ -48,14 +50,14 @@ async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
 
 async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
 
-    query = await db.execute(Select(Item).filter(Item.id == item_id))
-    found_item: Item | None = query.scalars().first()
+    query:ScalarResult[Item] = (await db.execute(select(Item).filter(Item.id == item_id))).scalars()
+    found_item: Item | None = query.first()
 
     if not found_item:
         raise NotFoundError(f"Item ID {item_id} not found")
 
     if await is_duplicate_item(item.name, item.maker_id, db):
-        raise AlreadyExistsError( "item name already exists" )
+        raise AlreadyExistsError("item name already exists")
 
     found_item.name = item.name
     found_item.maker_id = item.maker_id

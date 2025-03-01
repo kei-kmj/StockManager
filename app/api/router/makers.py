@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import makers as cruds
-from app.db.database import get_db
-from app.db.models import Maker
 from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
 from app.api.schemas.makers import MakerCommon, MakerCreate, MakerUpdate
+from app.db.database import get_db
+from app.db.models import Maker
 
 router = APIRouter()
 

@@ -3,9 +3,9 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import User
 from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
 from app.api.schemas.users import UserCreate, UserUpdate
+from app.db.models import User
 
 
 async def is_duplicate_email(email: str, db: AsyncSession) -> bool:

@@ -4,18 +4,20 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import items as cruds
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
 from app.db.database import get_db
 from app.db.models import Item
-from app.api.entity.exceptions import NotFoundError, AlreadyExistsError
-from app.api.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
 
 router = APIRouter()
 
 
-@router.get("/items/", response_model=Sequence[ItemResponse],
-            summary="Get all items",
-            description="Retrieve a list of all registered items.",
-            )
+@router.get(
+    "/items/",
+    response_model=Sequence[ItemResponse],
+    summary="Get all items",
+    description="Retrieve a list of all registered items.",
+)
 async def read_items(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Sequence[Item]:
@@ -23,12 +25,13 @@ async def read_items(
     return await cruds.get_items(db)
 
 
-@router.get("/items/{item_id}",
-            response_model=ItemResponse,
-            responses={404: {"description": "Item not found"}},
-            summary="Get a item by ID",
-            description="Retrieve a single item using its unique ID.",
-            )
+@router.get(
+    "/items/{item_id}",
+    response_model=ItemResponse,
+    responses={404: {"description": "Item not found"}},
+    summary="Get a item by ID",
+    description="Retrieve a single item using its unique ID.",
+)
 async def read_item(
     item_id: int, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> Item | None:
@@ -40,13 +43,14 @@ async def read_item(
         raise HTTPException(status_code=404, detail=str(e)) from None
 
 
-@router.post("/items/",
-             status_code=201,
-             response_model=ItemCommon,
-             summary="Create a new item",
-             description="Add a new item to the database. The tem name must be unique.",
-             responses={400: {"description": "Maker already exist"}},
-             )
+@router.post(
+    "/items/",
+    status_code=201,
+    response_model=ItemCommon,
+    summary="Create a new item",
+    description="Add a new item to the database. The tem name must be unique.",
+    responses={400: {"description": "Maker already exist"}},
+)
 async def create_item(
     item: ItemCreate, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> Item:
@@ -58,14 +62,16 @@ async def create_item(
         raise HTTPException(status_code=400, detail=str(e)) from None
 
 
-@router.put("/items/{item_id}",
-            response_model=ItemCommon,
-            summary="Update a maker's information",
-            description="Update an existing maker's details.",
-            responses={
-                400: {"description": "Maker already exist"},
-                404: {"description": "Maker not found"},
-            })
+@router.put(
+    "/items/{item_id}",
+    response_model=ItemCommon,
+    summary="Update a maker's information",
+    description="Update an existing maker's details.",
+    responses={
+        400: {"description": "Maker already exist"},
+        404: {"description": "Maker not found"},
+    },
+)
 async def update_item(
     item_id: int, item: ItemUpdate, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> Item:
@@ -80,12 +86,13 @@ async def update_item(
         raise HTTPException(status_code=404, detail=str(e)) from None
 
 
-@router.delete("/items/{item_id}",
-               status_code=204,
-               summary="Delete a item",
-               description="Delete a item from the database.",
-               responses={404: {"description": "Maker not found"}},
-               )
+@router.delete(
+    "/items/{item_id}",
+    status_code=204,
+    summary="Delete a item",
+    description="Delete a item from the database.",
+    responses={404: {"description": "Maker not found"}},
+)
 async def delete_item(
     item_id: int, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> None:
