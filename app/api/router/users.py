@@ -3,11 +3,11 @@ from typing import Annotated, Sequence
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.cruds import users as cruds
+from app.api.cruds import users as cruds
 from app.db.database import get_db
 from app.db.models import User
-from app.entity.exceptions import AlreadyExistsError, NotFoundError
-from app.schemas.users import UserCommon, UserCreate, UserUpdate
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.schemas.users import UserCommon, UserCreate, UserUpdate
 
 router = APIRouter()
 

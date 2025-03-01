@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from app.schemas.makers import MakerCommon
-from app.schemas.schemas import BaseSchema
+from app.api.schemas.makers import MakerCommon
+from app.api.schemas.schemas import BaseSchema
 
 
 class ItemCreate(BaseSchema):

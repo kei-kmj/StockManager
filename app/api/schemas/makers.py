@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.schemas.schemas import BaseSchema
+from app.api.schemas.schemas import BaseSchema
 
 
 class MakerCreate(BaseSchema):

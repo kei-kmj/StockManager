@@ -3,11 +3,11 @@ from typing import Annotated, Sequence
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.cruds import items as cruds
+from app.api.cruds import items as cruds
 from app.db.database import get_db
 from app.db.models import Item
-from app.entity.exceptions import NotFoundError, AlreadyExistsError
-from app.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
+from app.api.entity.exceptions import NotFoundError, AlreadyExistsError
+from app.api.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
 
 router = APIRouter()
 

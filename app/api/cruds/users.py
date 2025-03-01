@@ -4,8 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
-from app.entity.exceptions import AlreadyExistsError, NotFoundError
-from app.schemas.users import UserCreate, UserUpdate
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.schemas.users import UserCreate, UserUpdate
 
 
 async def is_duplicate_email(email: str, db: AsyncSession) -> bool:
@@ -62,6 +62,7 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> User:
         raise NotFoundError(f"User ID {user_id} not found")
 
     found_user.name = user.name
+    found_user.nickname = user.nickname
     found_user.email = user.email
 
     await db.commit()

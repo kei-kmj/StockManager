@@ -1,4 +1,3 @@
-from sqlite3 import IntegrityError
 from typing import Sequence
 
 from sqlalchemy import select, Select
@@ -6,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.db.models import Item, Maker
-from app.entity.exceptions import NotFoundError, AlreadyExistsError
-from app.schemas.items import ItemCreate, ItemUpdate
+from app.api.entity.exceptions import NotFoundError, AlreadyExistsError
+from app.api.schemas.items import ItemCreate, ItemUpdate
 
 
 async def is_duplicate_item(name: str, maker_id: int, db:AsyncSession) -> bool:
@@ -35,11 +34,8 @@ async def get_item(item_id: int, db: AsyncSession) -> Item | None:
 
 async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
 
-    query = await db.execute(select(Maker).where(Maker.id == item.maker_id))
-    found_item = query.scalars().first()
-
-    if not found_item:
-        raise AlreadyExistsError("Item name already exists (normalized check)")
+    if await is_duplicate_item(item.name, item.maker_id, db):
+        raise AlreadyExistsError( "item name already exists" )
 
     new_item = Item(**item.model_dump())
 
@@ -58,7 +54,7 @@ async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
     if not found_item:
         raise NotFoundError(f"Item ID {item_id} not found")
 
-    if is_duplicate_item(item.name, item.maker_id, db):
+    if await is_duplicate_item(item.name, item.maker_id, db):
         raise AlreadyExistsError( "item name already exists" )
 
     found_item.name = item.name
@@ -68,8 +64,6 @@ async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
     await db.refresh(found_item)
 
     return found_item
-
-
 
 
 async def delete_item(item_id: int, db: AsyncSession) -> None:
