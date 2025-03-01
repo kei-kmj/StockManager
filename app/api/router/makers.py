@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import makers as cruds
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
 from app.api.schemas.makers import MakerCommon, MakerCreate, MakerUpdate
 from app.db.database import get_db
 from app.db.models import Maker
@@ -48,7 +48,9 @@ async def read_maker(
     response_model=MakerCommon,
     summary="Create a new maker",
     description="Add a new maker to the database. The maker name must be unique.",
-    responses={400: {"description": "Maker already exist"}},
+    responses={400: {"description": "Maker already exist"},
+               500: {"description": "Record creation error"}},
+
 )
 async def create_maker(
     maker: MakerCreate, db: Annotated[AsyncSession, Depends(get_db)]
@@ -59,6 +61,9 @@ async def create_maker(
     except AlreadyExistsError as e:
         raise HTTPException(status_code=400, detail=str(e)) from None
 
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
 
 @router.put(
     "/makers/{maker_id}",
@@ -68,6 +73,7 @@ async def create_maker(
     responses={
         400: {"description": "Maker already exist"},
         404: {"description": "Maker not found"},
+        500: {"description": "Record update error"},
     },
 )
 async def update_maker(
@@ -83,13 +89,17 @@ async def update_maker(
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from None
 
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
 
 @router.delete(
     "/makers/{maker_id}",
     status_code=204,
     summary="Delete a maker",
     description="Delete a maker from the database.",
-    responses={404: {"description": "Maker not found"}},
+    responses={404: {"description": "Maker not found"},
+               500: {"description": "Record delete error"}}
 )
 async def delete_maker(
     maker_id: int, db: Annotated[AsyncSession, Depends(get_db)]
@@ -100,3 +110,6 @@ async def delete_maker(
 
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from None
+
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None

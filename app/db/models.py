@@ -78,9 +78,9 @@ class StockEvent(Base):
     __tablename__ = "stock_events"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    actor_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     item_id: Mapped[int] = mapped_column(ForeignKey("items.id"))
-    event_type: Mapped[str] = mapped_column(String)
+    event_type: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
     event_date: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.now(timezone.utc)

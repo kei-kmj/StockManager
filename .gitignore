@@ -1,2 +1,4 @@
 .idea/
-app/db/database.py
+ app/db/stockmanager.db
+ app/alembic.ini
+ app/alembic/

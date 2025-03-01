@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import users as cruds
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
 from app.api.schemas.users import UserCommon, UserCreate, UserUpdate
 from app.db.database import get_db
 from app.db.models import User
@@ -47,7 +47,8 @@ async def read_user(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]) 
     response_model=UserCommon,
     summary="Create a new user",
     description="Add a new user to the database. The user name must be unique.",
-    responses={400: {"description": "User already exist"}},
+    responses={400: {"description": "User already exist"},
+               500: {"description": "Record operation error"}},
 )
 async def create_user(
     user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]
@@ -59,6 +60,9 @@ async def create_user(
     except AlreadyExistsError as e:
         raise HTTPException(status_code=400, detail=str(e)) from None
 
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
 
 @router.put(
     "/users/{user_id}",
@@ -68,6 +72,7 @@ async def create_user(
     responses={
         400: {"description": "User already exist"},
         404: {"description": "User not found"},
+        500: {"description": "Record operation error"}
     },
 )
 async def update_user(
@@ -83,13 +88,17 @@ async def update_user(
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from None
 
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
 
 @router.delete(
     "/users/{user_id}",
     status_code=204,
     summary="Delete a user",
     description="Delete a user from the database.",
-    responses={404: {"description": "User not found"}},
+    responses={404: {"description": "User not found"},
+               500: {"description": "Record operation error"}}
 )
 async def delete_user(
     user_id: int, db: Annotated[AsyncSession, Depends(get_db)]
@@ -100,3 +109,6 @@ async def delete_user(
 
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from None
+
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None

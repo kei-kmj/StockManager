@@ -4,7 +4,7 @@ from sqlalchemy import ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
 from app.api.schemas.items import ItemCreate, ItemUpdate
 from app.db.models import Item
 
@@ -42,10 +42,15 @@ async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
     new_item = Item(**item.model_dump())
 
     db.add(new_item)
-    await db.commit()
-    await db.refresh(new_item)
 
-    return new_item
+    try:
+        await db.commit()
+        await db.refresh(new_item)
+        return new_item
+
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"登録に失敗しました: {str(e)}")
 
 
 async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
@@ -62,10 +67,15 @@ async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
     found_item.name = item.name
     found_item.maker_id = item.maker_id
 
-    await db.commit()
-    await db.refresh(found_item)
+    try:
+        await db.commit()
+        await db.refresh(found_item)
+        return found_item
 
-    return found_item
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"更新に失敗しました: {str(e)}")
+
 
 
 async def delete_item(item_id: int, db: AsyncSession) -> None:
@@ -76,4 +86,11 @@ async def delete_item(item_id: int, db: AsyncSession) -> None:
         raise NotFoundError(f"Maker ID {item_id} not found")
 
     await db.delete(found_item)
-    await db.commit()
+
+    try:
+        await db.commit()
+
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"削除に失敗しました: {str(e)}")
+

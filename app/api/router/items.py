@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import items as cruds
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
 from app.api.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
 from app.db.database import get_db
 from app.db.models import Item
@@ -49,7 +49,8 @@ async def read_item(
     response_model=ItemCommon,
     summary="Create a new item",
     description="Add a new item to the database. The tem name must be unique.",
-    responses={400: {"description": "Maker already exist"}},
+    responses={400: {"description": "Maker already exist"},
+               500: {"description": "Record create error"}}
 )
 async def create_item(
     item: ItemCreate, db: Annotated[AsyncSession, Depends(get_db)]
@@ -61,15 +62,19 @@ async def create_item(
     except AlreadyExistsError as e:
         raise HTTPException(status_code=400, detail=str(e)) from None
 
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
 
 @router.put(
     "/items/{item_id}",
     response_model=ItemCommon,
-    summary="Update a maker's information",
-    description="Update an existing maker's details.",
+    summary="Update a item's information",
+    description="Update an existing item's details.",
     responses={
-        400: {"description": "Maker already exist"},
-        404: {"description": "Maker not found"},
+        400: {"description": "Item already exist"},
+        404: {"description": "Item not found"},
+        500: {"description": "Record update error"}
     },
 )
 async def update_item(
@@ -85,13 +90,17 @@ async def update_item(
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from None
 
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None
+
 
 @router.delete(
     "/items/{item_id}",
     status_code=204,
     summary="Delete a item",
     description="Delete a item from the database.",
-    responses={404: {"description": "Maker not found"}},
+    responses={404: {"description": "Maker not found"},
+               500: {"description": "Record delete error"}},
 )
 async def delete_item(
     item_id: int, db: Annotated[AsyncSession, Depends(get_db)]
@@ -102,3 +111,6 @@ async def delete_item(
 
     except NotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e)) from None
+
+    except RecordOperationError as e:
+        raise HTTPException(status_code=500, detail=str(e)) from None

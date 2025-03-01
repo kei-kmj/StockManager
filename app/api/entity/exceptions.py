@@ -14,3 +14,7 @@ class NotFoundError(ApplicationError):
 
 class AlreadyExistsError(ApplicationError):
     status_code = 400
+
+
+class RecordOperationError(ApplicationError):
+    status_code = 500

@@ -3,7 +3,7 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
 from app.api.schemas.users import UserCreate, UserUpdate
 from app.db.models import User
 
@@ -48,10 +48,15 @@ async def create_user(user: UserCreate, db: AsyncSession) -> User:
     new_user = User(**user.model_dump())
 
     db.add(new_user)
-    await db.commit()
-    await db.refresh(new_user)
 
-    return new_user
+    try:
+        await db.commit()
+        await db.refresh(new_user)
+        return new_user
+
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"登録に失敗しました: {str(e)}")
 
 
 async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> User:
@@ -65,10 +70,16 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> User:
     found_user.nickname = user.nickname
     found_user.email = user.email
 
-    await db.commit()
-    await db.refresh(found_user)
+    try:
+        await db.commit()
+        await db.refresh(found_user)
+        return found_user
 
-    return found_user
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"更新に失敗しました: {str(e)}")
+
+
 
 
 async def delete_user(user_id: int, db: AsyncSession) -> None:
@@ -79,4 +90,11 @@ async def delete_user(user_id: int, db: AsyncSession) -> None:
         raise NotFoundError(f"User ID {user_id} not found")
 
     await db.delete(found_user)
-    await db.commit()
+
+    try:
+        await db.commit()
+
+    except Exception as e:
+        await db.rollback()
+
+        raise RecordOperationError(f"削除に失敗しました: {str(e)}")

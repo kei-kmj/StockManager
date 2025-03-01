@@ -5,7 +5,7 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError
+from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
 from app.api.schemas.makers import MakerCreate, MakerUpdate
 from app.db.models import Maker
 
@@ -48,10 +48,15 @@ async def create_maker(maker: MakerCreate, db: AsyncSession) -> Maker:
     new_maker = Maker(**maker.model_dump())
 
     db.add(new_maker)
-    await db.commit()
-    await db.refresh(new_maker)
 
-    return new_maker
+    try:
+        await db.commit()
+        await db.refresh(new_maker)
+        return new_maker
+
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"登録に失敗しました: {str(e)}")
 
 
 async def update_maker(maker_id: int, maker: MakerUpdate, db: AsyncSession) -> Maker:
@@ -72,10 +77,14 @@ async def update_maker(maker_id: int, maker: MakerUpdate, db: AsyncSession) -> M
 
     found_maker.name = normalized_name
 
-    await db.commit()
-    await db.refresh(found_maker)
+    try:
+        await db.commit()
+        await db.refresh(found_maker)
+        return found_maker
 
-    return found_maker
+    except Exception as e:
+        await db.rollback()
+        raise RecordOperationError(f"更新に失敗しました: {str(e)}")
 
 
 async def delete_maker(maker_id: int, db: AsyncSession) -> None:
@@ -86,4 +95,11 @@ async def delete_maker(maker_id: int, db: AsyncSession) -> None:
         raise NotFoundError(f"Maker ID {maker_id} not found")
 
     await db.delete(found_maker)
-    await db.commit()
+
+    try:
+        await db.commit()
+
+    except Exception as e:
+        await db.rollback()
+
+        raise RecordOperationError(f"削除に失敗しました: {str(e)}")
