@@ -1,13 +1,22 @@
 from datetime import datetime
 
+from app.schemas.makers import MakerCommon
 from app.schemas.schemas import BaseSchema
 
 
-class UserCreate(BaseSchema):
+class ItemCreate(BaseSchema):
     name: str
-    email: str
+    maker_id: int
 
 
-class UserCommon(UserCreate):
+class ItemUpdate(ItemCreate):
+    pass
+
+
+class ItemCommon(ItemCreate):
     id: int
     created_at: datetime
+
+
+class ItemResponse(ItemCommon):
+    maker: MakerCommon

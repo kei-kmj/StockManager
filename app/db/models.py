@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import List, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -68,6 +68,8 @@ class Item(Base):
 
     maker: Mapped["Maker"] = relationship(back_populates="items")
     stock_events: Mapped[List["StockEvent"]] = relationship(back_populates="item")
+
+    __table_args__ = (UniqueConstraint("name", "maker_id", name="uq_items_name_maker_id"))
 
 
 class StockEvent(Base):

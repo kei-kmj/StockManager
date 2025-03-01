@@ -3,54 +3,95 @@ from typing import Annotated, Sequence
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.cruds import users as cruds
+from app.cruds import items as cruds
 from app.db.database import get_db
-from app.db.models import User
-from app.schemas.users import UserCommon, UserCreate
+from app.db.models import Item
+from app.entity.exceptions import NotFoundError, AlreadyExistsError
+from app.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
 
 router = APIRouter()
 
 
-@router.get("/users/", response_model=list[UserCommon])
-async def read_users(
+@router.get("/items/", response_model=Sequence[ItemResponse],
+            summary="Get all items",
+            description="Retrieve a list of all registered items.",
+            )
+async def read_items(
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> Sequence[User]:
+) -> Sequence[Item]:
 
-    return await cruds.get_users(db)
-
-
-@router.get("/users/{user_id}", response_model=UserCommon)
-async def read_user(
-    user_id: int, db: Annotated[AsyncSession, Depends(get_db)]
-) -> User | None:
-
-    return await cruds.get_user(user_id, db)
+    return await cruds.get_items(db)
 
 
-@router.post("/users/", status_code=201, response_model=UserCommon)
-async def create_user(
-    user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]
-) -> User:
+@router.get("/items/{item_id}",
+            response_model=ItemResponse,
+            responses={404: {"description": "Item not found"}},
+            summary="Get a item by ID",
+            description="Retrieve a single item using its unique ID.",
+            )
+async def read_item(
+    item_id: int, db: Annotated[AsyncSession, Depends(get_db)]
+) -> Item | None:
 
-    return await cruds.create_user(user, db)
+    try:
+        return await cruds.get_item(item_id, db)
 
-
-@router.put("/users/{user_id}", response_model=UserCommon)
-async def update_user(
-    user_id: int, user: UserCommon, db: Annotated[AsyncSession, Depends(get_db)]
-) -> User | None:
-
-    result = await cruds.update_user(user_id, user, db)
-
-    if not result:
-        raise HTTPException(status_code=404, detail="user not found")
-
-    return result
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from None
 
 
-@router.delete("/users/{user_id}", status_code=204)
-async def delete_user(
-    user_id: int, db: Annotated[AsyncSession, Depends(get_db)]
+@router.post("/items/",
+             status_code=201,
+             response_model=ItemCommon,
+             summary="Create a new item",
+             description="Add a new item to the database. The tem name must be unique.",
+             responses={400: {"description": "Maker already exist"}},
+             )
+async def create_item(
+    item: ItemCreate, db: Annotated[AsyncSession, Depends(get_db)]
+) -> Item:
+
+    try:
+        return await cruds.create_item(item, db)
+
+    except AlreadyExistsError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+
+
+@router.put("/items/{item_id}",
+            response_model=ItemCommon,
+            summary="Update a maker's information",
+            description="Update an existing maker's details.",
+            responses={
+                400: {"description": "Maker already exist"},
+                404: {"description": "Maker not found"},
+            })
+async def update_item(
+    item_id: int, item: ItemUpdate, db: Annotated[AsyncSession, Depends(get_db)]
+) -> Item:
+
+    try:
+        return await cruds.update_item(item_id, item, db)
+
+    except AlreadyExistsError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from None
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from None
+
+
+@router.delete("/items/{item_id}",
+               status_code=204,
+               summary="Delete a item",
+               description="Delete a item from the database.",
+               responses={404: {"description": "Maker not found"}},
+               )
+async def delete_item(
+    item_id: int, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> None:
 
-    await cruds.delete_user(user_id, db)
+    try:
+        await cruds.delete_item(item_id, db)
+
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e)) from None

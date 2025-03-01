@@ -1,55 +1,83 @@
+from sqlite3 import IntegrityError
 from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import select, Select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from app.db.models import User
-from app.schemas.users import UserCommon, UserCreate
+from app.db.models import Item, Maker
+from app.entity.exceptions import NotFoundError, AlreadyExistsError
+from app.schemas.items import ItemCreate, ItemUpdate
 
 
-async def get_users(db: AsyncSession) -> Sequence[User]:
-    result = await db.execute(select(User))
+async def is_duplicate_item(name: str, maker_id: int, db:AsyncSession) -> bool:
+    query = await db.execute(select(Item).filter(Item.name == name, Item.maker_id == maker_id))
+
+    return query.scalars().first() is not None
+
+
+async def get_items(db: AsyncSession) -> Sequence[Item]:
+    result = await db.execute(select(Item).options(joinedload(Item.maker)))
     return result.scalars().all()
 
 
-async def get_user(user_id: int, db: AsyncSession) -> User | None:
-    result = await db.execute(select(User).filter(User.id == user_id))
+async def get_item(item_id: int, db: AsyncSession) -> Item | None:
+    query = await db.execute(
+        select(Item).options(joinedload(Item.maker)).filter(Item.id == item_id)
+    )
+    found_item = query.scalars().first()
 
-    return result.scalars().first()
+    if not found_item:
+        raise NotFoundError(f"Maker ID {item_id} not found")
+
+    return found_item
 
 
-async def create_user(user: UserCreate, db: AsyncSession) -> User:
-    db_user = User(**user.model_dump())
+async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
 
-    db.add(db_user)
+    query = await db.execute(select(Maker).where(Maker.id == item.maker_id))
+    found_item = query.scalars().first()
+
+    if not found_item:
+        raise AlreadyExistsError("Item name already exists (normalized check)")
+
+    new_item = Item(**item.model_dump())
+
+    db.add(new_item)
     await db.commit()
-    await db.refresh(db_user)
+    await db.refresh(new_item)
 
-    return db_user
+    return new_item
 
 
-async def update_user(user_id: int, user: UserCommon, db: AsyncSession) -> User | None:
-    result = await db.execute(select(User).filter(User.id == user_id))
-    db_user = result.scalars().first()
+async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
 
-    if not db_user:
-        return None
+    query = await db.execute(Select(Item).filter(Item.id == item_id))
+    found_item: Item | None = query.scalars().first()
 
-    db_user.name = user.name
-    db_user.email = user.email
+    if not found_item:
+        raise NotFoundError(f"Item ID {item_id} not found")
+
+    if is_duplicate_item(item.name, item.maker_id, db):
+        raise AlreadyExistsError( "item name already exists" )
+
+    found_item.name = item.name
+    found_item.maker_id = item.maker_id
 
     await db.commit()
-    await db.refresh(db_user)
+    await db.refresh(found_item)
 
-    return db_user
+    return found_item
 
 
-async def delete_user(user_id: int, db: AsyncSession) -> None:
-    result = await db.execute(select(User).filter(User.id == user_id))
-    db_user = result.scalars().first()
 
-    if not db_user:
-        return None
 
-    await db.delete(db_user)
+async def delete_item(item_id: int, db: AsyncSession) -> None:
+    result = await db.execute(select(Item).filter(Item.id == item_id))
+    found_item = result.scalars().first()
+
+    if not found_item:
+        raise NotFoundError(f"Maker ID {item_id} not found")
+
+    await db.delete(found_item)
     await db.commit()
