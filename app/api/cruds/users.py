@@ -3,7 +3,11 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
+from app.api.entity.exceptions import (
+    AlreadyExistsError,
+    NotFoundError,
+    RecordOperationError,
+)
 from app.api.schemas.users import UserCreate, UserUpdate
 from app.db.models import User
 
@@ -56,7 +60,7 @@ async def create_user(user: UserCreate, db: AsyncSession) -> User:
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"登録に失敗しました: {str(e)}")
+        raise RecordOperationError(f"登録に失敗しました: {str(e)}") from None
 
 
 async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> User:
@@ -77,9 +81,7 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> User:
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"更新に失敗しました: {str(e)}")
-
-
+        raise RecordOperationError(f"更新に失敗しました: {str(e)}") from None
 
 
 async def delete_user(user_id: int, db: AsyncSession) -> None:
@@ -97,4 +99,4 @@ async def delete_user(user_id: int, db: AsyncSession) -> None:
     except Exception as e:
         await db.rollback()
 
-        raise RecordOperationError(f"削除に失敗しました: {str(e)}")
+        raise RecordOperationError(f"削除に失敗しました: {str(e)}") from None

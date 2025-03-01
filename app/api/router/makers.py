@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import makers as cruds
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
+from app.api.entity.exceptions import (
+    AlreadyExistsError,
+    NotFoundError,
+    RecordOperationError,
+)
 from app.api.schemas.makers import MakerCommon, MakerCreate, MakerUpdate
 from app.db.database import get_db
 from app.db.models import Maker
@@ -48,9 +52,10 @@ async def read_maker(
     response_model=MakerCommon,
     summary="Create a new maker",
     description="Add a new maker to the database. The maker name must be unique.",
-    responses={400: {"description": "Maker already exist"},
-               500: {"description": "Record creation error"}},
-
+    responses={
+        400: {"description": "Maker already exist"},
+        500: {"description": "Record creation error"},
+    },
 )
 async def create_maker(
     maker: MakerCreate, db: Annotated[AsyncSession, Depends(get_db)]
@@ -98,8 +103,10 @@ async def update_maker(
     status_code=204,
     summary="Delete a maker",
     description="Delete a maker from the database.",
-    responses={404: {"description": "Maker not found"},
-               500: {"description": "Record delete error"}}
+    responses={
+        404: {"description": "Maker not found"},
+        500: {"description": "Record delete error"},
+    },
 )
 async def delete_maker(
     maker_id: int, db: Annotated[AsyncSession, Depends(get_db)]

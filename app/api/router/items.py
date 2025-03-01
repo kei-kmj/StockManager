@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import items as cruds
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
+from app.api.entity.exceptions import (
+    AlreadyExistsError,
+    NotFoundError,
+    RecordOperationError,
+)
 from app.api.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
 from app.db.database import get_db
 from app.db.models import Item
@@ -49,8 +53,10 @@ async def read_item(
     response_model=ItemCommon,
     summary="Create a new item",
     description="Add a new item to the database. The tem name must be unique.",
-    responses={400: {"description": "Maker already exist"},
-               500: {"description": "Record create error"}}
+    responses={
+        400: {"description": "Maker already exist"},
+        500: {"description": "Record create error"},
+    },
 )
 async def create_item(
     item: ItemCreate, db: Annotated[AsyncSession, Depends(get_db)]
@@ -74,7 +80,7 @@ async def create_item(
     responses={
         400: {"description": "Item already exist"},
         404: {"description": "Item not found"},
-        500: {"description": "Record update error"}
+        500: {"description": "Record update error"},
     },
 )
 async def update_item(
@@ -99,8 +105,10 @@ async def update_item(
     status_code=204,
     summary="Delete a item",
     description="Delete a item from the database.",
-    responses={404: {"description": "Maker not found"},
-               500: {"description": "Record delete error"}},
+    responses={
+        404: {"description": "Maker not found"},
+        500: {"description": "Record delete error"},
+    },
 )
 async def delete_item(
     item_id: int, db: Annotated[AsyncSession, Depends(get_db)]

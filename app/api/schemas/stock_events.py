@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from app.api.schemas.items import ItemCommon, ItemResponse
+from app.api.schemas.items import ItemResponse
 from app.api.schemas.schemas import BaseSchema
 from app.api.schemas.users import UserCommon
 
@@ -15,7 +15,7 @@ class StockEventCreate(BaseSchema):
 
 
 class StockEventCommon(StockEventCreate):
-    id:int
+    id: int
     event_date: datetime
 
 

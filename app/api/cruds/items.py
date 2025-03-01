@@ -4,7 +4,11 @@ from sqlalchemy import ScalarResult, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
+from app.api.entity.exceptions import (
+    AlreadyExistsError,
+    NotFoundError,
+    RecordOperationError,
+)
 from app.api.schemas.items import ItemCreate, ItemUpdate
 from app.db.models import Item
 
@@ -50,12 +54,14 @@ async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"登録に失敗しました: {str(e)}")
+        raise RecordOperationError(f"登録に失敗しました: {str(e)}") from None
 
 
 async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
 
-    query:ScalarResult[Item] = (await db.execute(select(Item).filter(Item.id == item_id))).scalars()
+    query: ScalarResult[Item] = (
+        await db.execute(select(Item).filter(Item.id == item_id))
+    ).scalars()
     found_item: Item | None = query.first()
 
     if not found_item:
@@ -74,8 +80,7 @@ async def update_item(item_id: int, item: ItemUpdate, db: AsyncSession) -> Item:
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"更新に失敗しました: {str(e)}")
-
+        raise RecordOperationError(f"更新に失敗しました: {str(e)}") from None
 
 
 async def delete_item(item_id: int, db: AsyncSession) -> None:
@@ -92,5 +97,4 @@ async def delete_item(item_id: int, db: AsyncSession) -> None:
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"削除に失敗しました: {str(e)}")
-
+        raise RecordOperationError(f"削除に失敗しました: {str(e)}") from None

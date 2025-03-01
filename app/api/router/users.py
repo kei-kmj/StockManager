@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.cruds import users as cruds
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
+from app.api.entity.exceptions import (
+    AlreadyExistsError,
+    NotFoundError,
+    RecordOperationError,
+)
 from app.api.schemas.users import UserCommon, UserCreate, UserUpdate
 from app.db.database import get_db
 from app.db.models import User
@@ -47,8 +51,10 @@ async def read_user(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]) 
     response_model=UserCommon,
     summary="Create a new user",
     description="Add a new user to the database. The user name must be unique.",
-    responses={400: {"description": "User already exist"},
-               500: {"description": "Record operation error"}},
+    responses={
+        400: {"description": "User already exist"},
+        500: {"description": "Record operation error"},
+    },
 )
 async def create_user(
     user: UserCreate, db: Annotated[AsyncSession, Depends(get_db)]
@@ -72,7 +78,7 @@ async def create_user(
     responses={
         400: {"description": "User already exist"},
         404: {"description": "User not found"},
-        500: {"description": "Record operation error"}
+        500: {"description": "Record operation error"},
     },
 )
 async def update_user(
@@ -97,8 +103,10 @@ async def update_user(
     status_code=204,
     summary="Delete a user",
     description="Delete a user from the database.",
-    responses={404: {"description": "User not found"},
-               500: {"description": "Record operation error"}}
+    responses={
+        404: {"description": "User not found"},
+        500: {"description": "Record operation error"},
+    },
 )
 async def delete_user(
     user_id: int, db: Annotated[AsyncSession, Depends(get_db)]

@@ -5,7 +5,11 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.entity.exceptions import AlreadyExistsError, NotFoundError, RecordOperationError
+from app.api.entity.exceptions import (
+    AlreadyExistsError,
+    NotFoundError,
+    RecordOperationError,
+)
 from app.api.schemas.makers import MakerCreate, MakerUpdate
 from app.db.models import Maker
 
@@ -56,7 +60,7 @@ async def create_maker(maker: MakerCreate, db: AsyncSession) -> Maker:
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"登録に失敗しました: {str(e)}")
+        raise RecordOperationError(f"登録に失敗しました: {str(e)}") from None
 
 
 async def update_maker(maker_id: int, maker: MakerUpdate, db: AsyncSession) -> Maker:
@@ -84,7 +88,7 @@ async def update_maker(maker_id: int, maker: MakerUpdate, db: AsyncSession) -> M
 
     except Exception as e:
         await db.rollback()
-        raise RecordOperationError(f"更新に失敗しました: {str(e)}")
+        raise RecordOperationError(f"更新に失敗しました: {str(e)}") from None
 
 
 async def delete_maker(maker_id: int, db: AsyncSession) -> None:
@@ -102,4 +106,4 @@ async def delete_maker(maker_id: int, db: AsyncSession) -> None:
     except Exception as e:
         await db.rollback()
 
-        raise RecordOperationError(f"削除に失敗しました: {str(e)}")
+        raise RecordOperationError(f"削除に失敗しました: {str(e)}") from None
