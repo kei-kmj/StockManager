@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from app.api.schemas.items import ItemResponse
+from app.api.schemas.items import ClosiongResponse
 from app.api.schemas.schemas import BaseSchema
 from app.api.schemas.users import UserCommon
 
@@ -21,4 +21,4 @@ class StockEventCommon(StockEventCreate):
 
 class StockEventResponse(StockEventCommon):
     user: UserCommon
-    item: ItemResponse
+    item: ClosiongResponse

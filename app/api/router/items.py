@@ -9,7 +9,7 @@ from app.api.entity.exceptions import (
     NotFoundError,
     RecordOperationError,
 )
-from app.api.schemas.items import ItemCommon, ItemCreate, ItemResponse, ItemUpdate
+from app.api.schemas.items import ClosiongCommon, ItemCreate, ClosiongResponse, ItemUpdate
 from app.db.database import get_db
 from app.db.models import Item
 
@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.get(
     "/items/",
-    response_model=Sequence[ItemResponse],
+    response_model=Sequence[ClosiongResponse],
     summary="Get all items",
     description="Retrieve a list of all registered items.",
 )
@@ -31,7 +31,7 @@ async def read_items(
 
 @router.get(
     "/items/{item_id}",
-    response_model=ItemResponse,
+    response_model=ClosiongResponse,
     responses={404: {"description": "Item not found"}},
     summary="Get a item by ID",
     description="Retrieve a single item using its unique ID.",
@@ -50,7 +50,7 @@ async def read_item(
 @router.post(
     "/items/",
     status_code=201,
-    response_model=ItemCommon,
+    response_model=ClosiongCommon,
     summary="Create a new item",
     description="Add a new item to the database. The tem name must be unique.",
     responses={
@@ -74,7 +74,7 @@ async def create_item(
 
 @router.put(
     "/items/{item_id}",
-    response_model=ItemCommon,
+    response_model=ClosiongCommon,
     summary="Update a item's information",
     description="Update an existing item's details.",
     responses={

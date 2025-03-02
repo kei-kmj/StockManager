@@ -1,5 +1,6 @@
 from typing import AsyncGenerator
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.db.models import Base
@@ -33,4 +34,10 @@ async def init_db() -> None:
 
 async def get_db() -> AsyncGenerator:
     async with async_session() as session:
+        # SQLiteは互換性の関係で、デフォルトでは外部キー制約が適用されない
+        # https://www.sqlite.org/foreignkeys.html
+        # Assuming the library is compiled with foreign key constraints enabled,
+        # it must still be enabled by the application at runtime,
+        # using the PRAGMA foreign_keys command.
+        await session.execute(text("PRAGMA foreign_keys = ON;"))
         yield session

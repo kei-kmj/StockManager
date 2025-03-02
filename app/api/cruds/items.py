@@ -7,10 +7,10 @@ from sqlalchemy.orm import joinedload
 from app.api.entity.exceptions import (
     AlreadyExistsError,
     NotFoundError,
-    RecordOperationError,
+    RecordOperationError, RecordNotFoundError,
 )
 from app.api.schemas.items import ItemCreate, ItemUpdate
-from app.db.models import Item
+from app.db.models import Item, Maker
 
 
 async def is_duplicate_item(name: str, maker_id: int, db: AsyncSession) -> bool:
@@ -39,6 +39,12 @@ async def get_item(item_id: int, db: AsyncSession) -> Item:
 
 
 async def create_item(item: ItemCreate, db: AsyncSession) -> Item:
+
+    maker = await db.execute(select(Maker).where(Maker.id == item.maker_id))
+    found_maker = maker.scalars().first()
+
+    if found_maker is None:
+        raise RecordNotFoundError("not found")
 
     if await is_duplicate_item(item.name, item.maker_id, db):
         raise AlreadyExistsError("item name already exists")

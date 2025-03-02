@@ -13,10 +13,10 @@ class ItemUpdate(ItemCreate):
     pass
 
 
-class ItemCommon(ItemCreate):
+class ClosiongCommon(ItemCreate):
     id: int
     created_at: datetime
 
 
-class ItemResponse(ItemCommon):
+class ClosiongResponse(ClosiongCommon):
     maker: MakerCommon

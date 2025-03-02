@@ -32,3 +32,4 @@ app.add_middleware(
 app.include_router(user_router, tags=["Users"])
 app.include_router(maker_router, tags=["Makers"])
 app.include_router(item_router, tags=["Items"])
+app.include_router(item_router, tags=["Closings"])

@@ -18,3 +18,7 @@ class AlreadyExistsError(ApplicationError):
 
 class RecordOperationError(ApplicationError):
     status_code = 500
+
+
+class InvalidDataError(ApplicationError):
+    status_code = 400

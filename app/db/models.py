@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from typing import List, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, Date, Boolean
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -89,3 +89,23 @@ class StockEvent(Base):
 
     user: Mapped["User"] = relationship(back_populates="stock_events")
     item: Mapped["Item"] = relationship(back_populates="stock_events")
+
+
+class InventorySnapshot(Base):
+    __table_name__ = "inventory_snapshots"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    item_id: Mapped[int] = mapped_column(ForeignKey("items.id"))
+    snapshot_date: Mapped[date] = mapped_column(Date, index=True)
+    stock_quantity: Mapped[int] = mapped_column(Integer)
+
+    __table_args__ = (UniqueConstraint("item_id", "snapshot_date", name="uq_inventory_snapshot"),)
+
+
+class Closing(Base):
+    __table_name__ = "closings"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    closing_date: Mapped[date] = mapped_column(Date, unique=True)
+    is_closed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    __table_args__ = (UniqueConstraint("closing_date", name="uq_inventory_closing"),)
