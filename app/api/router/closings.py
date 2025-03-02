@@ -6,10 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.cruds import closings as cruds
 from app.api.entity.exceptions import (
     AlreadyExistsError,
-    NotFoundError,
     RecordOperationError,
 )
-from app.api.schemas.closings import ClosingCreate, ClosingCommon
+from app.api.schemas.closings import ClosingCommon, ClosingCreate
 from app.db.database import get_db
 from app.db.models import Closing
 
@@ -17,13 +16,9 @@ router = APIRouter()
 
 
 @router.get(
-    "/closings/latest",
-    response_model=ClosingCommon,
-    summary="Get a latest closing"
+    "/closings/latest", response_model=ClosingCommon, summary="Get a latest closing"
 )
-async def read_closing(
-    db: Annotated[AsyncSession, Depends(get_db)]
-) -> Closing | None:
+async def read_closing(db: Annotated[AsyncSession, Depends(get_db)]) -> Closing | None:
 
     return await cruds.get_latest_closing(db)
 
@@ -41,7 +36,7 @@ async def read_closing(
 )
 async def create_closing(
     closing: ClosingCreate, db: Annotated[AsyncSession, Depends(get_db)]
-) -> Closing:
+) -> None:
 
     try:
         return await cruds.create_closing(closing, db)
@@ -51,4 +46,3 @@ async def create_closing(
 
     except RecordOperationError as e:
         raise HTTPException(status_code=500, detail=str(e)) from None
-

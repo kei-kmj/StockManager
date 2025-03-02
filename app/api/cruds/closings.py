@@ -1,4 +1,4 @@
-from datetime import timedelta, date
+from datetime import date, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,11 +9,9 @@ from app.api.schemas.closings import ClosingCreate
 from app.db.models import Closing
 
 
-async def get_latest_closing(db: AsyncSession):
+async def get_latest_closing(db: AsyncSession) -> Closing:
     query = await db.execute(
-        select(Closing)
-        .filter(Closing.is_closed == True)
-        .order_by(Closing.closing_date.desc())
+        select(Closing).filter(Closing.is_closed).order_by(Closing.closing_date.desc())
     )
     latest_closing = query.scalars().first()
 
@@ -27,17 +25,20 @@ async def get_latest_closing(db: AsyncSession):
     return latest_closing
 
 
-async def create_closing(closing : ClosingCreate, db: AsyncSession):
+async def create_closing(closing: ClosingCreate, db: AsyncSession) -> None:
 
     try:
         latest_closing = await get_latest_closing(db)
-        allowed_closing_date = (latest_closing.closing_date.replace(day=1) + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+        allowed_closing_date = (
+            latest_closing.closing_date.replace(day=1) + timedelta(days=31)
+        ).replace(day=1) - timedelta(days=1)
 
         if closing.closing_date != allowed_closing_date:
-            raise InvalidDataError(f"Invalid closing date: {closing.closing_date}. Expected next closing date is {allowed_closing_date}.")
+            raise InvalidDataError(
+                f"Invalid closing date: {closing.closing_date}. Expected next closing date is {allowed_closing_date}."
+            )
 
-
-        new_closing = (Closing(**closing.model_dump()))
+        new_closing = Closing(**closing.model_dump())
         db.add(new_closing)
 
         year, month = closing.closing_date.year, closing.closing_date.month
@@ -46,9 +47,4 @@ async def create_closing(closing : ClosingCreate, db: AsyncSession):
     except Exception as e:
         await db.rollback()
 
-        raise RecordOperationError(f"Failed to close inventory: {str(e)}")
-
-
-
-
-
+        raise RecordOperationError(f"Failed to close inventory: {str(e)}") from None

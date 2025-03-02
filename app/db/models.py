@@ -1,7 +1,15 @@
-from datetime import datetime, timezone, date
+from datetime import date, datetime, timezone
 from typing import List, Optional
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, Date, Boolean
+from sqlalchemy import (
+    Boolean,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -98,7 +106,9 @@ class InventorySnapshot(Base):
     snapshot_date: Mapped[date] = mapped_column(Date, index=True)
     stock_quantity: Mapped[int] = mapped_column(Integer)
 
-    __table_args__ = (UniqueConstraint("item_id", "snapshot_date", name="uq_inventory_snapshot"),)
+    __table_args__ = (
+        UniqueConstraint("item_id", "snapshot_date", name="uq_inventory_snapshot"),
+    )
 
 
 class Closing(Base):
