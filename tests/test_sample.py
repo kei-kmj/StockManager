@@ -6,6 +6,6 @@ client = TestClient(app)
 
 
 def test_read_root():
-    response = client.get("/")
+    response = client.get("/users")
 
     assert response.status_code == 200

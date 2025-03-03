@@ -99,8 +99,9 @@ class StockEvent(Base):
     item: Mapped["Item"] = relationship(back_populates="stock_events")
 
 
+
 class InventorySnapshot(Base):
-    __table_name__ = "inventory_snapshots"
+    __tablename__ = "inventory_snapshots"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     item_id: Mapped[int] = mapped_column(ForeignKey("items.id"))
     snapshot_date: Mapped[date] = mapped_column(Date, index=True)
@@ -112,7 +113,7 @@ class InventorySnapshot(Base):
 
 
 class Closing(Base):
-    __table_name__ = "closings"
+    __tablename__ = "closings"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     closing_date: Mapped[date] = mapped_column(Date, unique=True)

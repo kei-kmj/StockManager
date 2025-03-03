@@ -43,7 +43,7 @@ async def read_items(
 )
 async def read_item(
     item_id: int, db: Annotated[AsyncSession, Depends(get_db)]
-) -> Item | None:
+) -> Item:
 
     try:
         return await cruds.get_item(item_id, db)

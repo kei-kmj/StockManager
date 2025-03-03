@@ -1,3 +1,4 @@
+import os
 from typing import AsyncGenerator
 
 from sqlalchemy import text
@@ -6,6 +7,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from app.db.models import Base
 
 DATABASE_URL = "sqlite+aiosqlite:///./app/db/stockmanager.db"
+
+db_dir = "./app/db"
+os.makedirs(db_dir, exist_ok=True)
+
 
 # SQLite用エンジン
 # https://docs.sqlalchemy.org/en/20/tutorial/engine.html#tutorial-engine
