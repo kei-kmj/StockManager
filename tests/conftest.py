@@ -12,7 +12,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def db():
     Base.metadata.create_all(bind=engine)
     print("Create table", Base.metadata.tables.keys())
@@ -25,7 +25,7 @@ def db():
 
 
 @pytest.fixture
-def client():
+def client(db):
     def override_get_db():
         yield db
 
