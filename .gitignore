@@ -1,4 +1,5 @@
 .idea/
- app/db/stockmanager.db
- app/alembic.ini
- app/alembic/
+app/db/stockmanager.db
+app/alembic.ini
+app/alembic/
+frontend/node_modulesß
