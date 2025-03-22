@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Sequence, Any, Coroutine
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,7 +18,7 @@ router = APIRouter()
 @router.get(
     "/closings/latest", response_model=ClosingCommon, summary="Get a latest closing"
 )
-async def read_closing(db: Annotated[AsyncSession, Depends(get_db)]) -> Closing | None:
+async def read_closing(db: Annotated[AsyncSession, Depends(get_db)]) -> Closing:
 
     return await cruds.get_latest_closing(db)
 

@@ -160,10 +160,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/closings/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a latest closing */
+        get: operations["read_closing_closings_latest_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/closings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create a new closing
+         * @description Add a new closing to the database.
+         */
+        post: operations["create_closing_closings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stock_events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get stock event */
+        get: operations["read_events_stock_events_get"];
+        put?: never;
+        /** Create Stock Events */
+        post: operations["create_stock_events_stock_events_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ClosingCommon */
+        ClosingCommon: {
+            /**
+             * Closing Date
+             * Format: date
+             */
+            closing_date?: string;
+            /** Is Closed */
+            is_closed: boolean;
+            /** Id */
+            id: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ClosingCreate */
+        ClosingCreate: {
+            /**
+             * Closing Date
+             * Format: date
+             */
+            closing_date?: string;
+            /** Is Closed */
+            is_closed: boolean;
+        };
         /** ErrorResponse */
         ErrorResponse: {
             /** Detail */
@@ -238,6 +320,61 @@ export interface components {
         MakerUpdate: {
             /** Name */
             name: string;
+        };
+        /** StockEventCommon */
+        StockEventCommon: {
+            /** Actor Id */
+            actor_id: number;
+            /** Item Id */
+            item_id: number;
+            /** Event Type */
+            event_type: number;
+            /** Quantity */
+            quantity: number;
+            /** Note */
+            note: number | null;
+            /** Id */
+            id: number;
+            /**
+             * Event Date
+             * Format: date-time
+             */
+            event_date: string;
+        };
+        /** StockEventCreate */
+        StockEventCreate: {
+            /** Actor Id */
+            actor_id: number;
+            /** Item Id */
+            item_id: number;
+            /** Event Type */
+            event_type: number;
+            /** Quantity */
+            quantity: number;
+            /** Note */
+            note: number | null;
+        };
+        /** StockEventResponse */
+        StockEventResponse: {
+            /** Actor Id */
+            actor_id: number;
+            /** Item Id */
+            item_id: number;
+            /** Event Type */
+            event_type: number;
+            /** Quantity */
+            quantity: number;
+            /** Note */
+            note: number | null;
+            /** Id */
+            id: number;
+            /**
+             * Event Date
+             * Format: date-time
+             */
+            event_date: string;
+            user: components["schemas"]["UserCommon"];
+            item: components["schemas"]["ItemResponse"];
         };
         /** UserCommon */
         UserCommon: {
@@ -897,6 +1034,153 @@ export interface operations {
                 };
             };
             /** @description Record delete error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    read_closing_closings_latest_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosingCommon"];
+                };
+            };
+        };
+    };
+    create_closing_closings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClosingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosingCommon"];
+                };
+            };
+            /** @description Closing already exist */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Record create error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    read_events_stock_events_get: {
+        parameters: {
+            query?: {
+                /** @description アイテムIDでフィルタ */
+                item_id?: number | null;
+                /** @description 実行者のユーザーIDでフィルタ */
+                actor_id?: number | null;
+                /** @description イベントタイプでフィルタ */
+                event_type?: number | null;
+                /** @description 取得する最大件数 */
+                limit?: number | null;
+                /** @description オフセット */
+                offset?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockEventResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_stock_events_stock_events_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockEventCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockEventCommon"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Record update error */
             500: {
                 headers: {
                     [name: string]: unknown;
