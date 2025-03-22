@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/users/": {
+    "/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -15,13 +15,13 @@ export interface paths {
          * Get all users
          * @description Retrieve a list of all registered users.
          */
-        get: operations["read_users_users__get"];
+        get: operations["read_users_users_get"];
         put?: never;
         /**
          * Create a new user
          * @description Add a new user to the database. The user name must be unique.
          */
-        post: operations["create_user_users__post"];
+        post: operations["create_user_users_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -56,7 +56,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/makers/": {
+    "/makers": {
         parameters: {
             query?: never;
             header?: never;
@@ -67,13 +67,13 @@ export interface paths {
          * Get all makers
          * @description Retrieve a list of all registered makers.
          */
-        get: operations["read_makers_makers__get"];
+        get: operations["read_makers_makers_get"];
         put?: never;
         /**
          * Create a new maker
          * @description Add a new maker to the database. The maker name must be unique.
          */
-        post: operations["create_maker_makers__post"];
+        post: operations["create_maker_makers_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -108,7 +108,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/items/": {
+    "/items": {
         parameters: {
             query?: never;
             header?: never;
@@ -119,13 +119,13 @@ export interface paths {
          * Get all items
          * @description Retrieve a list of all registered items.
          */
-        get: operations["read_items_items__get"];
+        get: operations["read_items_items_get"];
         put?: never;
         /**
          * Create a new item
          * @description Add a new item to the database. The tem name must be unique.
          */
-        post: operations["create_item_items__post"];
+        post: operations["create_item_items_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -164,8 +164,18 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** ClosiongCommon */
-        ClosiongCommon: {
+        /** ErrorResponse */
+        ErrorResponse: {
+            /** Detail */
+            detail: string;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** ItemCommon */
+        ItemCommon: {
             /** Name */
             name: string;
             /** Maker Id */
@@ -178,8 +188,15 @@ export interface components {
              */
             created_at: string;
         };
-        /** ClosiongResponse */
-        ClosiongResponse: {
+        /** ItemCreate */
+        ItemCreate: {
+            /** Name */
+            name: string;
+            /** Maker Id */
+            maker_id: number;
+        };
+        /** ItemResponse */
+        ItemResponse: {
             /** Name */
             name: string;
             /** Maker Id */
@@ -192,18 +209,6 @@ export interface components {
              */
             created_at: string;
             maker: components["schemas"]["MakerCommon"];
-        };
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /** ItemCreate */
-        ItemCreate: {
-            /** Name */
-            name: string;
-            /** Maker Id */
-            maker_id: number;
         };
         /** ItemUpdate */
         ItemUpdate: {
@@ -286,7 +291,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    read_users_users__get: {
+    read_users_users_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -306,7 +311,7 @@ export interface operations {
             };
         };
     };
-    create_user_users__post: {
+    create_user_users_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -490,7 +495,7 @@ export interface operations {
             };
         };
     };
-    read_makers_makers__get: {
+    read_makers_makers_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -510,7 +515,7 @@ export interface operations {
             };
         };
     };
-    create_maker_makers__post: {
+    create_maker_makers_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -694,7 +699,7 @@ export interface operations {
             };
         };
     };
-    read_items_items__get: {
+    read_items_items_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -709,12 +714,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ClosiongResponse"][];
+                    "application/json": components["schemas"]["ItemResponse"][];
                 };
             };
         };
     };
-    create_item_items__post: {
+    create_item_items_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -733,7 +738,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ClosiongCommon"];
+                    "application/json": components["schemas"]["ItemCommon"];
                 };
             };
             /** @description Maker already exist */
@@ -778,7 +783,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ClosiongResponse"];
+                    "application/json": components["schemas"]["ItemResponse"];
                 };
             };
             /** @description Item not found */
@@ -786,7 +791,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -820,7 +827,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ClosiongCommon"];
+                    "application/json": components["schemas"]["ItemCommon"];
                 };
             };
             /** @description Item already exist */

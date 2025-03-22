@@ -24,7 +24,7 @@ async def read_closing(db: Annotated[AsyncSession, Depends(get_db)]) -> Closing 
 
 
 @router.post(
-    "/closings/",
+    "/closings",
     status_code=201,
     response_model=ClosingCommon,
     summary="Create a new closing",

@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/makers/",
+    "/makers",
     response_model=Sequence[MakerCommon],
     summary="Get all makers",
     description="Retrieve a list of all registered makers.",
@@ -47,7 +47,7 @@ async def read_maker(
 
 
 @router.post(
-    "/makers/",
+    "/makers",
     status_code=201,
     response_model=MakerCommon,
     summary="Create a new maker",

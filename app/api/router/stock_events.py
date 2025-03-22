@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get(
-    "stock_events",
+    "/stock_events",
     response_model=Sequence[StockEventResponse],
     summary="Get stock event",
 )
@@ -37,7 +37,7 @@ async def read_events(
 
 
 @router.post(
-    "stock_events",
+    "/stock_events",
     status_code=201,
     response_model=StockEventCommon,
     responses={500: {"description": "Record update error"}},

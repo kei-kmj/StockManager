@@ -10,11 +10,12 @@ from app.api.entity.exceptions import (
     RecordOperationError,
 )
 from app.api.schemas.items import (
-    ClosiongCommon,
-    ClosiongResponse,
+    ItemCommon,
+    ItemResponse,
     ItemCreate,
     ItemUpdate,
 )
+from app.api.schemas.schemas import ErrorResponse
 from app.db.database import get_db
 from app.db.models import Item
 
@@ -22,8 +23,8 @@ router = APIRouter()
 
 
 @router.get(
-    "/items/",
-    response_model=Sequence[ClosiongResponse],
+    "/items",
+    response_model=Sequence[ItemResponse],
     summary="Get all items",
     description="Retrieve a list of all registered items.",
 )
@@ -36,8 +37,10 @@ async def read_items(
 
 @router.get(
     "/items/{item_id}",
-    response_model=ClosiongResponse,
-    responses={404: {"description": "Item not found"}},
+    response_model=ItemResponse,
+    responses={404: {
+        "model":ErrorResponse,
+        "description": "Item not found"}},
     summary="Get a item by ID",
     description="Retrieve a single item using its unique ID.",
 )
@@ -53,9 +56,9 @@ async def read_item(
 
 
 @router.post(
-    "/items/",
+    "/items",
     status_code=201,
-    response_model=ClosiongCommon,
+    response_model=ItemCommon,
     summary="Create a new item",
     description="Add a new item to the database. The tem name must be unique.",
     responses={
@@ -79,7 +82,7 @@ async def create_item(
 
 @router.put(
     "/items/{item_id}",
-    response_model=ClosiongCommon,
+    response_model=ItemCommon,
     summary="Update a item's information",
     description="Update an existing item's details.",
     responses={

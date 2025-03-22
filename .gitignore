@@ -2,4 +2,4 @@
 app/db/stockmanager.db
 app/alembic.ini
 app/alembic/
-frontend/node_modules/
+/frontend/node_modules/

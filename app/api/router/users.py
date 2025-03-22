@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/users/",
+    "/users",
     response_model=list[UserCommon],
     summary="Get all users",
     description="Retrieve a list of all registered users.",
@@ -46,7 +46,7 @@ async def read_user(user_id: int, db: Annotated[AsyncSession, Depends(get_db)]) 
 
 
 @router.post(
-    "/users/",
+    "/users",
     status_code=201,
     response_model=UserCommon,
     summary="Create a new user",
