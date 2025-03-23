@@ -12,6 +12,7 @@
     "test:ts": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.114.27",
     "openapi-fetch": "^0.13.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
