@@ -67,7 +67,7 @@ export const updateMaker = async (
 
 
 export const deleteMaker = async (makerID: number) :Promise<void> => {
-    const {error } = await client.DELETE('/makers/{maker_id}', {
+    const { error } = await client.DELETE('/makers/{maker_id}', {
         params: { path: {maker_id: makerID }}
     })
     if ( error ){
