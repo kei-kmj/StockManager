@@ -3,6 +3,7 @@ import { RootRoute } from '../../RootRoute'
 import {Users} from "./Users";
 import {CreateUser} from "./CreateUser";
 import {EditUser} from "./EditUser";
+import {ShowUser} from "./ShowUser";
 
 export const usersRoutes = createRoute(
     {
@@ -22,6 +23,12 @@ export const createUserRoute = createRoute({
     getParentRoute: () => usersRoutes,
     path: 'new',
     component: CreateUser
+})
+
+export const showUserRoute = createRoute({
+    getParentRoute: () => usersRoutes,
+    path: '$userId',
+    component: ShowUser
 })
 
 export const editUserRoute = createRoute({
