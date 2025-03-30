@@ -1,5 +1,5 @@
 import type {paths} from "./types.ts";
-import {client} from "./apiClient.ts";
+import {client} from "./apiClient";
 
 
 type MakersResponse = paths['/makers']['get']['responses']['200']['content']['application/json'];
@@ -14,7 +14,7 @@ export const fetchMakers = async (): Promise<MakersResponse | undefined> => {
     return data
 }
 
-type MakerDetailResponse= paths['/makers/{maker_id}']['get']['responses']['200']['content']['application/json']
+export type MakerDetailResponse= paths['/makers/{maker_id}']['get']['responses']['200']['content']['application/json']
 
 export const fetchMakerDetail = async (makerID: number) :Promise<MakerDetailResponse | undefined> => {
     const { data, error } = await client.GET('/makers/{maker_id}', {
@@ -27,8 +27,8 @@ export const fetchMakerDetail = async (makerID: number) :Promise<MakerDetailResp
     return data
 }
 
-type MakerCreateRequest = paths['/makers']['post']['requestBody']['content']['application/json'];
-type MakerCreateResponse = paths['/makers']['post']['responses']['201']['content']['application/json'];
+export type MakerCreateRequest = paths['/makers']['post']['requestBody']['content']['application/json'];
+export type MakerCreateResponse = paths['/makers']['post']['responses']['201']['content']['application/json'];
 
 
 export const createMaker = async (maker: MakerCreateRequest): Promise<MakerCreateResponse | undefined> => {
@@ -46,7 +46,7 @@ export const createMaker = async (maker: MakerCreateRequest): Promise<MakerCreat
 }
 
 
-type MakerUpdateRequest = paths['/makers/{maker_id}']['put']['requestBody']['content']['application/json'];
+export type MakerUpdateRequest = paths['/makers/{maker_id}']['put']['requestBody']['content']['application/json'];
 type MakerUpdateResponse = paths['/makers/{maker_id}']['put']['responses']['200']['content']['application/json'];
 
 

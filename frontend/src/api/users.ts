@@ -28,7 +28,7 @@ export const fetchUserDetail = async (userID: number) :Promise<UserDetailRespons
 }
 
 export type UserCreateRequest = paths['/users']['post']['requestBody']['content']['application/json'];
-type UserCreateResponse = paths['/users']['post']['responses']['201']['content']['application/json'];
+export type UserCreateResponse = paths['/users']['post']['responses']['201']['content']['application/json'];
 
 
 export const createUser = async (user: UserCreateRequest): Promise<UserCreateResponse | undefined> => {

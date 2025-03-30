@@ -1,5 +1,5 @@
 import type {paths} from "./types.ts";
-import {client} from "./apiClient.ts";
+import {client} from "./apiClient";
 
 
 type ItemsResponse = paths['/items']['get']['responses']['200']['content']['application/json'];

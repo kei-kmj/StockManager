@@ -19,11 +19,6 @@ export const EditUser = () => {
     loadUser()
   }, [userId])
 
-  // const handleSubmit = async (values: UserUpdateRequest) => {
-  //   await updateUser(Number(userId), values);
-  //   message.success('更新しました');
-  //   router.navigate({to: '/users'});
-  // };
   const handleSubmit = useSaveHandler(
     (values: UserUpdateRequest) => updateUser(Number(userId), values),
     {action: "保存"}

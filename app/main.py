@@ -32,7 +32,7 @@ app.add_middleware(
 
 
 # @appはFastAPIのインスタンス
-app.include_router(user_router, tags=["Users"])
+app.include_router(user_router, tags=["Makers"])
 app.include_router(maker_router, tags=["Makers"])
 app.include_router(item_router, tags=["Items"])
 app.include_router(closing_router, tags=["Closings"])

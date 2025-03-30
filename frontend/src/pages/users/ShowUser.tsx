@@ -1,9 +1,9 @@
 import 'antd/dist/reset.css';
-import {useParams, useRouter} from '@tanstack/react-router';
+import {useParams} from '@tanstack/react-router';
 import {deleteUser, fetchUserDetail} from '../../api/users';
 import {useEffect, useState} from "react";
 import type {components} from "../../api/types";
-import {Button, Descriptions, message, Spin} from "antd";
+import {Descriptions, Spin} from "antd";
 import {DeleteButton} from "../../components/DeleteButton";
 import {EditButton} from "../../components/EditButton";
 
@@ -13,8 +13,6 @@ export const ShowUser = () => {
   const {userId} = useParams({from: '/users/$userId'});
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const router = useRouter();
 
   useEffect(() => {
     const load = async () => {
