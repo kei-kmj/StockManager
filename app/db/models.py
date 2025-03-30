@@ -8,7 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    UniqueConstraint,
+    UniqueConstraint, func,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -30,7 +30,7 @@ class User(Base):
     nickname: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(timezone.utc)
+        DateTime(timezone=True), default=func.now()
     )
 
     # https://docs.sqlalchemy.org/en/20/orm/basic_relationships.html#one-to-many
