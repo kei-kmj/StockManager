@@ -58,7 +58,7 @@ class Maker(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, unique=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(timezone.utc)
+        DateTime(timezone=True), default=func.now()
     )
 
     items: Mapped[List["Item"]] = relationship(back_populates="maker")
@@ -71,7 +71,7 @@ class Item(Base):
     name: Mapped[str] = mapped_column(String)
     maker_id: Mapped[int] = mapped_column(ForeignKey("makers.id"))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(timezone.utc)
+        DateTime(timezone=True), default=func.now()
     )
 
     maker: Mapped["Maker"] = relationship(back_populates="items")
@@ -91,7 +91,7 @@ class StockEvent(Base):
     event_type: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
     event_date: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now(timezone.utc)
+        DateTime(timezone=True), default=func.now()
     )
     note: Mapped[Optional[str]] = mapped_column(String)
 
